@@ -5,14 +5,14 @@
 
 namespace Whale\Page;
 
-use Whale\Db\Entity;
+use Whale\Db\DbEntity;
 use Whale\Db\Traits\ContentTrait;
 use Whale\Db\Traits\OrderTrait;
 use Whale\Db\Traits\ParentTrait;
 use Whale\Db\Traits\PublishedTrait;
 use Whale\Db\Traits\TimestampableTrait;
 
-class PageEntity extends Entity
+class PageEntity extends DbEntity
 {
     use ParentTrait;
     use TimestampableTrait;
