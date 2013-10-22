@@ -1,0 +1,14 @@
+
+<h2>{{ page.getTitle }}</h2>
+<form name="form" method="post" action="" class="form-horizontal" novalidate="novalidate">
+    {{ form_start(form) }}
+    {{ form_rest(form) }}
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Отправить</button>
+        <button type="reset" class="btn btn-secondary">Отмена</button>
+    </div>
+    {{ form_end(form) }}
+</form>
+<script>
+    currentPageId = {{ page.getId }};
+</script>

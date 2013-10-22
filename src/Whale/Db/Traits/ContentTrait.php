@@ -4,27 +4,10 @@ namespace Whale\Db\Traits;
 
 trait ContentTrait {
 
-    /** @var string */
-    protected $_title;
+    use TitledTrait;
+
     /** @var string */
     protected $_content;
-    /** @var bool */
-
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->_title;
-    }
-
-    /**
-     * @param string $title
-     */
-    public function setTitle($title)
-    {
-        $this->_title = $title;
-    }
 
     /**
      * @return string

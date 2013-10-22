@@ -7,7 +7,7 @@ namespace Whale\Db;
 
 use Whale\System;
 
-class Entity {
+class DbEntity {
 
     /** @var int */
     protected $_id;

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Dmitry Groza">
+    <link href="/vendor/bootstrap/css/metro.bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <style>
+            /* sticky footer */
+        html, body {
+            height: 100%;
+        }
+
+        #wrap {
+            min-height: 100%;
+            height: auto !important;
+            height: 100%;
+            margin: 0 auto -60px;
+        }
+
+        footer {
+            height: 60px;
+        }
+        #push {
+            height: 80px;
+        }
+        @media (max-width: 767px) {
+            #footer {
+                margin-left: -20px;
+                margin-right: -20px;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+            /* /sticky footer */
+
+        footer {
+            background-color: #f5f5f5;
+            line-height: 60px;
+        }
+        .admin-image {
+            padding-right: 15px;
+        }
+        .btn.action {
+            padding: 0px 8px;
+        }
+        .table .treetable-active, .table .treetable-active:hover, .table .treetable-active td:hover, .table .treetable-active td {
+            background-color: #007fff !important;
+        }
+        .treetable-active a, .treetable-active a:hover {
+            color: #eee;
+        }
+    </style>
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <script src="/vendor/jquery/jquery-1.9.1.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.js"></script>
+    <link href="/vendor/treetable/jquery.treetable.css" rel="stylesheet" type="text/css" />
+    <link href="/vendor/treetable/jquery.treetable.theme.default.css" rel="stylesheet" type="text/css" />
+    <script src="/vendor/treetable/jquery.treetable.js"></script>
+
+    <script src="/js/script.js"></script>
+</head>
+
+<body>
+<div id="wrap">
+    <div class="navbar navbar-top navbar-inverse">
+        <div class="navbar-inner">
+            <div class="container-fluid">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <a class="brand" href="/admin">Admin</a>
+
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li><a href="/admin/news">Новости</a></li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" id="gLabel" role="button" data-toggle="dropdown" data-target="#" href="/catalog">
+                                Галерея
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="gLabel">
+                                <li><a href="/admin/gallery">Галерея</a></li>
+                                <li><a href="/admin/gallerymain">Слайдер</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="/admin/page-text">Тексты</a></li>
+                        <li><a href="/admin/settings">Настройки</a></li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#" href="/catalog">
+                                Каталог
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <li><a href="/admin/category">Категории</a></li>
+                                <li><a href="/admin/thesaurus">Справочники</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav pull-right">
+                        <li><a href="/">Сайт</a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="/admin/logout">Выйти</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid main">
+        <div class="row-fluid">
+            <div class="span2" id="app-sidebar">
+                <h2>&nbsp;</h2>
+                <table class="table table-hover treetable">
+                    <tbody>
+                    {% for page in _pages %}
+                        <tr data-tt-id="{{ page.getId }}" data-tt-parent-id="{{ page.getIdParent }}">
+                            <td><a href="{{ path('admin_page_edit', {id: page.getId}) }}">{{ page.getTitle }}</a></td>
+                            <td>
+
+                                <div class="dropdown">
+                                    <a class="btn dropdown-toggle pull-right action edit" data-toggle="dropdown" href="#">
+                                        <i class="icon-edit"></i>
+                                        <i class="caret"></i>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        <li><a href="">Подстраницы</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Редактировать</a></li>
+                                        <li class="dropdown-submenu">
+                                            <a href="#">Добавить...</a>
+                                            <ul class="dropdown-menu">
+                                                <li><a tabindex="-1" href="#">Подстраницу</a></li>
+                                                <li><a href="#">Рекомендацию</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li><a tabindex="-1" href="#">Удалить</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <script>
+                var currentPageId = null;
+
+                $(document).ready(function(){
+                    $('.treetable').treetable({
+                        expandable: true
+                    });
+                    $.each($(".treetable").data("treetable").nodes, function(key, value){
+                        if (currentPageId && $(value).attr('id') == currentPageId) {
+                            $(".treetable").treetable("reveal", value.id);
+                            $('[data-tt-id="' + value.id +  '"]').addClass('treetable-active');
+                        }
+                    });
+                });
+            </script>
+            <div class="span9">
+                <div class="row-fluid">
+                    {% for type, messages in app.flashbag.all %}
+                        <div class="alert alert-{{ type }}">
+                            <a class="close" data-dismiss="alert" href="#">&times;</a>
+                            {% for message in messages %}
+                                {{ message }}<br />
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    {{ content|raw }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="push"></div>
+</div>
+<footer>
+    <div class="container-fluid">
+        &copy; 2013 <i>to Insomnia with Love</i>
+    </div>
+</footer>
+</body>
+</html>

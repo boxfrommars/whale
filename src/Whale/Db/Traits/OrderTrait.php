@@ -20,7 +20,7 @@ trait OrderTrait {
      */
     public function setOrder($order)
     {
-        $this->_order = $order;
+        $this->_ord = $order;
     }
 
 }

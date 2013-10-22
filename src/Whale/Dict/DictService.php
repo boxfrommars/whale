@@ -6,54 +6,26 @@
 namespace Whale\Dict;
 
 
-use Doctrine\DBAL\Connection;
+use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
+use Whale\Db\DbEntity;
+use Whale\Db\DbEntityService;
 
-class DictService {
-
-    /** @var  Connection */
-    protected $_db;
-
+class DictService extends DbEntityService {
     /**
-     * @param Connection $db
-     * @param array $options
+     * @return FormTypeInterface|ResolvedFormTypeInterface|string
      */
-    public function __construct($db, $options = array()) {
-        $this->setDb($db);
-    }
-
-    /**
-     * @param string $tableName
-     * @return array
-     */
-    public function fetchAll($tableName) {
-        $qb = $this->getQuery($tableName);
-        return $this->getDb()->executeQuery($qb)->fetchAll();
-    }
-
-    /**
-     * @param Connection $db
-     */
-    public function setDb($db)
+    public function getForm()
     {
-        $this->_db = $db;
+        // TODO: Implement getForm() method.
     }
 
     /**
-     * @return Connection
+     * @param array $data
+     * @return DbEntity
      */
-    public function getDb()
+    public function createEntity($data = array())
     {
-        return $this->_db;
+        // TODO: Implement createEntity() method.
     }
-
-    /**
-     * @param string $tableName
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function getQuery($tableName) {
-        $qb = $this->getDb()->createQueryBuilder();
-        $qb->select("*")
-            ->from($tableName, 't');
-        return $qb;
-    }
-} 
+}

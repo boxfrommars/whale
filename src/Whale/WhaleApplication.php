@@ -57,6 +57,10 @@ class WhaleApplication extends Application {
                 'debug' => $this['debug'],
             ),
         ));
+        $path = realpath(__DIR__ . '/Resources/views');
+        $this['logtime']('path: ' . $path);
+        $this['twig.loader']->addLoader(new \Twig_Loader_Filesystem($path));
+
         $this->register(new ValidatorServiceProvider());
         $this->register(new TranslationServiceProvider(), array( 'translator.messages' => array()));
         $this->register(new DoctrineServiceProvider(), $this['config']['db']);
@@ -81,13 +85,13 @@ class WhaleApplication extends Application {
             )
         ));
         $this->get('/login', function(Request $request) {
-            return $this['twig']->render('login.twig', array(
+            return $this['twig']->render('admin/login.twig', array(
                 'error'         => $this['security.last_error']($request),
                 'last_username' => $this['session']->get('_security.last_username'),
             ));
         });
         $this->get('/admin/logout', function(Request $request) {
-            return $this['twig']->render('login.twig', array(
+            return $this['twig']->render('admin/login.twig', array(
                 'error'         => $this['security.last_error']($request),
                 'last_username' => $this['session']->get('_security.last_username'),
             ));

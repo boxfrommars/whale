@@ -9,7 +9,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
-abstract class EntityService
+abstract class DbEntityService
 {
     /** @var  Connection */
     protected $_db;
@@ -32,7 +32,7 @@ abstract class EntityService
     }
 
     /**
-     * @param Entity $entity
+     * @param DbEntity $entity
      * @return void
      */
     public function save($entity)
@@ -41,7 +41,7 @@ abstract class EntityService
     }
 
     /**
-     * @param Entity $entity
+     * @param DbEntity $entity
      */
     public function insert($entity)
     {
@@ -58,7 +58,7 @@ abstract class EntityService
     }
 
     /**
-     * @param Entity $entity
+     * @param DbEntity $entity
      */
     public function update($entity)
     {
@@ -73,21 +73,56 @@ abstract class EntityService
     }
 
     /**
+     * @param int $id
+     * @return bool|DbEntity
+     */
+    public function fetch($id) {
+        $qb = $this->getQuery();
+        $qb->add('where', 'e.id = :id');
+        $entityData = $this->getDb()->executeQuery($qb, array('id' => $id))->fetch();;
+        return ($entityData === false) ? false : $this->createEntity($entityData);
+    }
+
+    /**
+     * @return DbEntity[]
+     */
+    public function fetchAll() {
+        $qb = $this->getQuery();
+        return $this->fetchQuery($qb);
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function getQuery() {
+        $qb = $this->getDb()->createQueryBuilder();
+        $qb->select("e.*")->from($this->getName(), 'e');
+        return $qb;
+    }
+
+    /**
+     * @param \Doctrine\DBAL\Query\QueryBuilder $qb
+     * @return array
+     */
+    public function fetchQuery($qb) {
+        $entitiesData = $this->getDb()->executeQuery($qb)->fetchAll();
+        $entities = array();
+        foreach ($entitiesData as $entityData) {
+            $entities[] = $this->createEntity($entityData);
+        }
+        return $entities;
+    }
+
+    /**
      * @return FormTypeInterface|ResolvedFormTypeInterface|string
      */
     public abstract function getForm();
 
     /**
      * @param array $data
-     * @return Entity
+     * @return DbEntity
      */
     public abstract function createEntity($data = array());
-
-    /**
-     * @param $id
-     * @return Entity
-     */
-    public abstract function fetch($id);
 
     /**
      * @return Connection
