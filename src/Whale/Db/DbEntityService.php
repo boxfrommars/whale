@@ -29,6 +29,7 @@ abstract class DbEntityService
         $this->setDb($db);
         if (array_key_exists('name', $options)) $this->setName($options['name']);
         if (array_key_exists('seq', $options)) $this->setSeq($options['seq']);
+        if (array_key_exists('service_name', $options)) $this->setServiceName($options['service_name']);
     }
 
     /**

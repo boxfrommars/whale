@@ -3,7 +3,7 @@
  * @author Dmitry Groza <boxfrommars@gmail.com>
  */
 
-namespace Whale\Dict;
+namespace Whale\Db\Entity;
 
 
 use Symfony\Component\Form\FormTypeInterface;
@@ -11,13 +11,14 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Whale\Db\DbEntity;
 use Whale\Db\DbEntityService;
 
-class DictService extends DbEntityService {
+class DbContentEntityService extends DbEntityService {
+
     /**
      * @return FormTypeInterface|ResolvedFormTypeInterface|string
      */
     public function getForm()
     {
-        // TODO: Implement getForm() method.
+        return new DbContentForm();
     }
 
     /**
@@ -26,6 +27,6 @@ class DictService extends DbEntityService {
      */
     public function createEntity($data = array())
     {
-        // TODO: Implement createEntity() method.
+        return new DbContentEntity($data);
     }
-}
+} 

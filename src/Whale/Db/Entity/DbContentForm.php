@@ -16,8 +16,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class DbContentForm extends AbstractType {
 
-
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $defaultInputAttrs = array(
@@ -28,7 +26,7 @@ class DbContentForm extends AbstractType {
             ->add('title', 'text', array(
                 'label' => 'Заголовок',
                 'attr' => $defaultInputAttrs,
-                'constraints' => array(new Assert\NotBlank(), new Assert\Length(array('min' => 5)))
+                'constraints' => array(new Assert\NotBlank(), new Assert\Length(array('min' => 1)))
             ))
             ->add('content', 'textarea', array(
                 'label' => 'Контент',

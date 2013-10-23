@@ -46,8 +46,8 @@ class DbControllerProvider implements ControllerProviderInterface {
 
         $controllers->match('/edit/{id}', $processor)->bind('admin_' . $service->getServiceName() . '_edit');
         $controllers->match('/create', $processor)->bind('admin_' . $service->getServiceName() . '_create');
-        $controllers->match('/create/idParent/{idParent}', function(Request $request, $idParent) use ($app, $processor) {
-            return $processor($request, null, array('idParent' => $idParent));
+        $controllers->match('/create/{paramName}/{paramValue}', function(Request $request, $paramName, $paramValue) use ($app, $processor) {
+            return $processor($request, null, array($paramName => $paramValue));
         })->bind('admin_' . $service->getServiceName() . '_create_parented');
 
         return $controllers;
