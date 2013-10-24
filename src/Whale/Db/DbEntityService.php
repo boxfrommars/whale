@@ -9,7 +9,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
-abstract class DbEntityService
+class DbEntityService
 {
     /** @var  Connection */
     protected $_db;
@@ -19,6 +19,12 @@ abstract class DbEntityService
     protected $_serviceName;
     /** @var string table sequence */
     protected $_seq;
+
+    /** @var Callable */
+    protected $_entityCreator;
+
+    /** @var Callable */
+    protected $_formCreator;
 
     /**
      * @param Connection $db
@@ -30,6 +36,8 @@ abstract class DbEntityService
         if (array_key_exists('name', $options)) $this->setName($options['name']);
         if (array_key_exists('seq', $options)) $this->setSeq($options['seq']);
         if (array_key_exists('service_name', $options)) $this->setServiceName($options['service_name']);
+        if (array_key_exists('entity_creator', $options)) $this->setEntityCreator($options['entity_creator']);
+        if (array_key_exists('form_creator', $options)) $this->setFormCreator($options['form_creator']);
     }
 
     /**
@@ -67,6 +75,7 @@ abstract class DbEntityService
         $types = array();
 
         foreach ($entity->raw() as $fieldName => $field) {
+            $fieldName = '"' . $fieldName . '"';
             $data[$fieldName] = $field['value'];
             $types[$fieldName] = $field['type'];
         }
@@ -117,13 +126,16 @@ abstract class DbEntityService
     /**
      * @return FormTypeInterface|ResolvedFormTypeInterface|string
      */
-    public abstract function getForm();
+    public function getForm() {
+        $creator = $this->getFormCreator();
+        return $creator();
+    }
 
-    /**
-     * @param array $data
-     * @return DbEntity
-     */
-    public abstract function createEntity($data = array());
+
+    public function createEntity($data = array()) {
+        $creator = $this->getEntityCreator();
+        return $creator($data);
+    }
 
     /**
      * @return Connection
@@ -187,5 +199,37 @@ abstract class DbEntityService
     public function setServiceName($serviceName)
     {
         $this->_serviceName = $serviceName;
+    }
+
+    /**
+     * @param Callable $formCreator
+     */
+    public function setFormCreator($formCreator)
+    {
+        $this->_formCreator = $formCreator;
+    }
+
+    /**
+     * @return Callable
+     */
+    public function getFormCreator()
+    {
+        return $this->_formCreator;
+    }
+
+    /**
+     * @param mixed $entityCreator
+     */
+    public function setEntityCreator($entityCreator)
+    {
+        $this->_entityCreator = $entityCreator;
+    }
+
+    /**
+     * @return Callable
+     */
+    public function getEntityCreator()
+    {
+        return $this->_entityCreator;
     }
 } 

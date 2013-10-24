@@ -26,7 +26,7 @@ class PageService extends DbEntityService {
             ->from($this->getName(), 'e')
             ->innerJoin('e', 'page', 'a', 'a.path @> e.path')
             ->groupBy(array('e.id', 'e.path', 'e.page_url'))
-            ->orderBy('"order"');
+            ->orderBy('e.order');
         return $qb;
     }
 

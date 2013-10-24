@@ -3,13 +3,13 @@
  * @author Dmitry Groza <boxfrommars@gmail.com>
  */
 
-namespace Whale\Dict;
+namespace Whale\Db\Entity;
 
 
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
-class DictServiceProvider implements ServiceProviderInterface {
+class DbContentEntryServiceProvider implements ServiceProviderInterface {
     /**
      * Registers services on the given app.
      * This method should only be used to configure services and parameters.
@@ -19,8 +19,11 @@ class DictServiceProvider implements ServiceProviderInterface {
      */
     public function register(Application $app)
     {
-        $app['dict.service'] = $app->share(function ($app) {
-            return  new DictService($app['db']);
+        $app['content.entity'] = $app->protect(function($data = array()){
+            return new DbContentEntity($data);
+        });
+        $app['content.form'] = $app->protect(function(){
+            return new DbContentForm();
         });
     }
 

@@ -40,7 +40,7 @@ class PageEntity extends DbEntity
 
     protected $_dbFields = array(
         array(
-            'name' => '"order"', // sic!
+            'name' => 'order', // sic!
             'type' => \PDO::PARAM_INT
         ),
 

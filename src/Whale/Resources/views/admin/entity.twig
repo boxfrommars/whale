@@ -1,5 +1,5 @@
-
-<h2>{{ page.getTitle }}</h2>
+<a href="{{ path('admin_' ~ _service_name ~ '_list') }}"><i class="icon-arrow-left"></i> вернуться к списку</a>
+<h2>{{ entity.getTitle ? entity.getTitle : 'Новая запись' }}</h2>
 <form name="form" method="post" action="" class="form-horizontal" novalidate="novalidate">
     {{ form_start(form) }}
     {{ form_rest(form) }}
@@ -10,5 +10,5 @@
     {{ form_end(form) }}
 </form>
 <script>
-    currentPageId = {{ page.getId }};
+    currentPageId = {{ entity.getId }};
 </script>

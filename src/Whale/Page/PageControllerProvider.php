@@ -28,7 +28,7 @@ class PageControllerProvider extends DbControllerProvider {
 
         $controllers->before(function () use ($app) {
             /** @var QueryBuilder $pagesQuery */
-            $pagesQuery = $this->getService()->getQuery()->resetQueryPart('order')->addOrderBy('e.path', 'ASC');
+            $pagesQuery = $this->getService()->getQuery()->resetQueryPart('orderBy')->addOrderBy('e.path', 'ASC');
             $app['twig']->addGlobal('_pages', $this->getService()->fetchQuery($pagesQuery));
             $app->log('admin before');
         });

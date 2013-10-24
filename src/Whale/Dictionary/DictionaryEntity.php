@@ -10,27 +10,27 @@ use Whale\Db\Entity\DbContentEntity;
 
 class DictionaryEntity extends DbContentEntity {
 
-    protected $_idDictionary;
+    protected $_name;
 
     protected $_dbFields = array(
         'title',
         'content',
-        'id_dictionary'
+        'name'
     );
 
     /**
-     * @param mixed $idDictionary
+     * @param string $name
      */
-    public function setIdDictionary($idDictionary)
+    public function setName($name)
     {
-        $this->_idDictionary = $idDictionary;
+        $this->_name = $name;
     }
 
     /**
      * @return mixed
      */
-    public function getIdDictionary()
+    public function getName()
     {
-        return $this->_idDictionary;
+        return $this->_name;
     }
 } 

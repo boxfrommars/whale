@@ -81,8 +81,9 @@
                 <a class="brand" href="/admin">Admin</a>
 
                 <div class="nav-collapse">
+                    {% block nav %}
                     <ul class="nav">
-                        <li><a href="/admin/news">Новости</a></li>
+                        <li><a href="/admin/page/">Страницы</a></li>
                         <li class="dropdown">
                             <a class="dropdown-toggle" id="gLabel" role="button" data-toggle="dropdown" data-target="#" href="/catalog">
                                 Галерея
@@ -93,7 +94,7 @@
                                 <li><a href="/admin/gallerymain">Слайдер</a></li>
                             </ul>
                         </li>
-                        <li><a href="/admin/page-text">Тексты</a></li>
+                        <li><a href="/admin/dict">Словари</a></li>
                         <li><a href="/admin/settings">Настройки</a></li>
                         <li class="dropdown">
                             <a class="dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#" href="/catalog">
@@ -111,6 +112,7 @@
                         <li class="divider-vertical"></li>
                         <li><a href="/admin/logout">Выйти</a></li>
                     </ul>
+                    {% endblock %}
                 </div>
             </div>
         </div>
@@ -119,6 +121,7 @@
     <div class="container-fluid main">
         <div class="row-fluid">
             <div class="span3" id="app-sidebar">
+                {% block sidebar %}
                 {% if _pages is defined %}
                 <h2>&nbsp;</h2>
                 <table class="table table-hover treetable">
@@ -154,6 +157,7 @@
                     </tbody>
                 </table>
                 {% endif %}
+                {% endblock %}
             </div>
             <script>
                 var currentPageId = null;
@@ -180,7 +184,9 @@
                             {% endfor %}
                         </div>
                     {% endfor %}
-                    {{ content|raw }}
+                    {% block content %}
+                        {{ content|raw }}
+                    {% endblock %}
                 </div>
             </div>
         </div>

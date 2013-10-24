@@ -16,11 +16,20 @@ class DbControllerProvider implements ControllerProviderInterface {
     /** @var DbEntityService */
     protected $_service;
 
+    /** @var string  */
+    protected $_entityLayout = 'admin/entity.twig';
+
+    /** @var string  */
+    protected $_listLayout = 'admin/list.twig';
+
     /**
      * @param DbEntityService $service
+     * @param array $options
      */
-    public function __construct($service) {
+    public function __construct($service, $options = array()) {
         $this->setService($service);
+        if (array_key_exists('entity_layout', $options)) $this->setEntityLayout($options['entity_layout']);
+        if (array_key_exists('list_layout', $options)) $this->setEntityLayout($options['list_layout']);
     }
 
     /**
@@ -35,14 +44,20 @@ class DbControllerProvider implements ControllerProviderInterface {
         /** @var ControllerCollection|Route $controllers */
         $controllers = $app['controllers_factory'];
 
-        $controllers->get('/', function () use ($app) {
-            return $app['twig']->render('admin/layout.twig', array(
-                'content' => 'Hello!',
-            ));
-        });
-
         $service = $this->getService();
-        $processor = $this->getProcessor($app);
+
+        $controllers->get('/', function () use ($app, $service) {
+
+            $entities = $service->fetchAll();
+
+            return $app['twig']->render('admin/layout.twig', array(
+                'content' => $app['twig']->render($this->getListLayout(), array(
+                    'entities' => $entities,
+                )),
+            ));
+        })->bind('admin_' . $service->getServiceName() . '_list');
+
+        $processor = $this->_getProcessor($app);
 
         $controllers->match('/edit/{id}', $processor)->bind('admin_' . $service->getServiceName() . '_edit');
         $controllers->match('/create', $processor)->bind('admin_' . $service->getServiceName() . '_create');
@@ -50,30 +65,19 @@ class DbControllerProvider implements ControllerProviderInterface {
             return $processor($request, null, array($paramName => $paramValue));
         })->bind('admin_' . $service->getServiceName() . '_create_parented');
 
+
+        $controllers->before(function () use ($app, $service) {
+            $app['twig']->addGlobal('_service_name', $service->getServiceName());
+        });
+
         return $controllers;
-    }
-
-    /**
-     * @param DbEntityService $service
-     */
-    public function setService($service)
-    {
-        $this->_service = $service;
-    }
-
-    /**
-     * @return DbEntityService
-     */
-    public function getService()
-    {
-        return $this->_service;
     }
 
     /**
      * @var \Whale\WhaleApplication|\Symfony\Component\Form\FormFactory[]|\Twig_Environment[]|\Symfony\Component\HttpFoundation\Session\Flash\FlashBag[] $app
      * @return callable
      */
-    protected function getProcessor($app){
+    protected function _getProcessor($app){
 
         $service = $this->getService();
 
@@ -94,13 +98,62 @@ class DbControllerProvider implements ControllerProviderInterface {
             }
 
             return $app['twig']->render('admin/layout.twig', array(
-                'content' => $app['twig']->render('admin/page.twig', array(
-                        'page' => $page,
+                'content' => $app['twig']->render($this->getEntityLayout(), array(
+                        'entity' => $page,
                         'form' => $form->createView(),
                     )),
             ));
         };
         return $processPage;
+    }
+
+
+    /**
+     * @param DbEntityService $service
+     */
+    public function setService($service)
+    {
+        $this->_service = $service;
+    }
+
+    /**
+     * @return DbEntityService
+     */
+    public function getService()
+    {
+        return $this->_service;
+    }
+
+    /**
+     * @param string $entityLayout
+     */
+    public function setEntityLayout($entityLayout)
+    {
+        $this->_entityLayout = $entityLayout;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityLayout()
+    {
+        return $this->_entityLayout;
+    }
+
+    /**
+     * @param string $listLayout
+     */
+    public function setListLayout($listLayout)
+    {
+        $this->_listLayout = $listLayout;
+    }
+
+    /**
+     * @return string
+     */
+    public function getListLayout()
+    {
+        return $this->_listLayout;
     }
 
 }

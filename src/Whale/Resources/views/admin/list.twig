@@ -1,0 +1,20 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>Заголовок</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for entity in entities %}
+        <tr>
+            <td><a href="{{ path('admin_' ~ _service_name ~ '_edit', {id: entity.getId}) }}">{{ entity.getTitle }}</a></td>
+            <td>
+                <a class="btn pull-right action edit" href="#">
+                    <i class="icon-edit"></i>
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
