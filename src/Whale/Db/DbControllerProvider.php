@@ -28,8 +28,9 @@ class DbControllerProvider implements ControllerProviderInterface {
      */
     public function __construct($service, $options = array()) {
         $this->setService($service);
+        $this->_serviceName = $this->getService()->getServiceName();
         if (array_key_exists('entity_layout', $options)) $this->setEntityLayout($options['entity_layout']);
-        if (array_key_exists('list_layout', $options)) $this->setEntityLayout($options['list_layout']);
+        if (array_key_exists('list_layout', $options)) $this->setListLayout($options['list_layout']);
     }
 
     /**
@@ -44,44 +45,34 @@ class DbControllerProvider implements ControllerProviderInterface {
         /** @var ControllerCollection|Route $controllers */
         $controllers = $app['controllers_factory'];
 
-        $service = $this->getService();
+        $processor = $this->_getEntityProcessor($app, $this->getService());
 
-        $controllers->get('/', function () use ($app, $service) {
-
-            $entities = $service->fetchAll();
-
-            return $app['twig']->render('admin/layout.twig', array(
-                'content' => $app['twig']->render($this->getListLayout(), array(
-                    'entities' => $entities,
-                )),
-            ));
-        })->bind('admin_' . $service->getServiceName() . '_list');
-
-        $processor = $this->_getProcessor($app);
-
-        $controllers->match('/edit/{id}', $processor)->bind('admin_' . $service->getServiceName() . '_edit');
-        $controllers->match('/create', $processor)->bind('admin_' . $service->getServiceName() . '_create');
+        $controllers->get('/', $this->_getListProcessor($app, $this->getService()))->bind('admin_' . $this->_serviceName . '_list');
+        $controllers->match('/edit/{id}', $processor)->bind('admin_' . $this->_serviceName . '_edit');
+        $controllers->match('/create', $processor)->bind('admin_' . $this->_serviceName . '_create');
         $controllers->match('/create/{paramName}/{paramValue}', function(Request $request, $paramName, $paramValue) use ($app, $processor) {
             return $processor($request, null, array($paramName => $paramValue));
-        })->bind('admin_' . $service->getServiceName() . '_create_parented');
+        })->bind('admin_' . $this->_serviceName . '_create_parented');
 
-
-        $controllers->before(function () use ($app, $service) {
-            $app['twig']->addGlobal('_service_name', $service->getServiceName());
+        $controllers->before(function () use ($app) {
+            $app['twig']->addGlobal('_service_name', $this->_serviceName);
         });
 
         return $controllers;
     }
 
     /**
-     * @var \Whale\WhaleApplication|\Symfony\Component\Form\FormFactory[]|\Twig_Environment[]|\Symfony\Component\HttpFoundation\Session\Flash\FlashBag[] $app
      * @return callable
      */
-    protected function _getProcessor($app){
 
-        $service = $this->getService();
+    /**
+     * @var \Whale\WhaleApplication|\Symfony\Component\Form\FormFactory[]|\Twig_Environment[]|\Symfony\Component\HttpFoundation\Session\Flash\FlashBag[] $app
+     * @param DbEntityService $service
+     * @return callable
+     */
+    protected function _getEntityProcessor($app, $service) {
 
-        $processPage = function(Request $request, $id = null, $params = array()) use ($app, $service) {
+        return function(Request $request, $id = null, $params = array()) use ($app, $service) {
             $page = ($id === null) ? $service->createEntity($params) : $service->fetch($id);
 
             if ($page === false) $app->abort('404', "the entity (id={$id}) you are looking for could not be found");
@@ -92,7 +83,7 @@ class DbControllerProvider implements ControllerProviderInterface {
             $form->handleRequest($request);
 
             if ($form->isValid()) {
-                $this->getService()->save($page);
+                $service->save($page);
                 $app['flashbag']->add('success', 'запись сохранена');
                 return $app->redirect($app->url('admin_' . $service->getServiceName() . '_edit', array('id' => $page->getId())));
             }
@@ -104,7 +95,22 @@ class DbControllerProvider implements ControllerProviderInterface {
                     )),
             ));
         };
-        return $processPage;
+    }
+
+
+    /**
+     * @param \Twig_Environment[] $app
+     * @param DbEntityService $service
+     * @return callable
+     */
+    protected function _getListProcessor($app, $service) {
+        return function () use ($app, $service) {
+            return $app['twig']->render('admin/layout.twig', array(
+                'content' => $app['twig']->render($this->getListLayout(), array(
+                        'entities' => $service->fetchAll(),
+                    )),
+            ));
+        };
     }
 
 

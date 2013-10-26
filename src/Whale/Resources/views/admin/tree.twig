@@ -1,0 +1,33 @@
+<h2>&nbsp;</h2>
+<table class="table table-hover treetable">
+    <tbody>
+    {% for entity in entities %}
+        <tr data-tt-id="{{ entity.getId }}" data-tt-parent-id="{{ entity.getIdParent }}">
+            <td><a href="{{ path('admin_page_edit', {id: entity.getId}) }}">{{ entity.getTitle }}</a></td>
+            <td>
+
+                <div class="dropdown">
+                    <a class="btn dropdown-toggle pull-right action edit" data-toggle="dropdown" href="#">
+                        <i class="icon-edit"></i>
+                        <i class="caret"></i>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <li><a href="">Подстраницы</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Редактировать</a></li>
+                        <li class="dropdown-submenu">
+                            <a href="#">Добавить...</a>
+                            <ul class="dropdown-menu">
+                                <li><a tabindex="-1" href="#">Подстраницу</a></li>
+                                <li><a href="#">Рекомендацию</a></li>
+                            </ul>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a tabindex="-1" href="#">Удалить</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
