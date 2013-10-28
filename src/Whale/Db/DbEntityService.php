@@ -89,7 +89,7 @@ class DbEntityService
     public function fetch($id) {
         $qb = $this->getQuery();
         $qb->add('where', 'e.id = :id');
-        $entityData = $this->getDb()->executeQuery($qb, array('id' => $id))->fetch();;
+        $entityData = $this->getDb()->executeQuery($qb, array('id' => $id))->fetch();
         return ($entityData === false) ? false : $this->createEntity($entityData);
     }
 
@@ -112,10 +112,11 @@ class DbEntityService
 
     /**
      * @param \Doctrine\DBAL\Query\QueryBuilder $qb
+     * @param array                             $params
      * @return array
      */
-    public function fetchQuery($qb) {
-        $entitiesData = $this->getDb()->executeQuery($qb)->fetchAll();
+    public function fetchQuery($qb, $params = array()) {
+        $entitiesData = $this->getDb()->executeQuery($qb, $params)->fetchAll();
         $entities = array();
         foreach ($entitiesData as $entityData) {
             $entities[] = $this->createEntity($entityData);

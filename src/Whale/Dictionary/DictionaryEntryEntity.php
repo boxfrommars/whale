@@ -33,4 +33,14 @@ class DictionaryEntryEntity extends DbContentEntity {
     {
         return $this->_idDictionary;
     }
+
+    public function getIdParent()
+    {
+        return $this->_idDictionary;
+    }
+
+    public function setIdParent($idParent)
+    {
+        $this->_idDictionary = $idParent;
+    }
 } 

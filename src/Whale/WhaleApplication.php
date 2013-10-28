@@ -18,6 +18,7 @@ use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Whale\Db\DbActionServiceProvider;
 
 class WhaleApplication extends Application {
 
@@ -65,6 +66,7 @@ class WhaleApplication extends Application {
         $this->register(new TranslationServiceProvider(), array( 'translator.messages' => array()));
         $this->register(new DoctrineServiceProvider(), $this['config']['db']);
 
+        $this->register(new DbActionServiceProvider());
 
         $this->before(
             function () {

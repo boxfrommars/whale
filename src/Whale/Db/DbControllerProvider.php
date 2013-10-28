@@ -68,11 +68,12 @@ class DbControllerProvider implements ControllerProviderInterface {
     /**
      * @var \Whale\WhaleApplication|\Symfony\Component\Form\FormFactory[]|\Twig_Environment[]|\Symfony\Component\HttpFoundation\Session\Flash\FlashBag[] $app
      * @param DbEntityService $service
+     * @param array $options
      * @return callable
      */
-    protected function _getEntityProcessor($app, $service) {
+    protected function _getEntityProcessor($app, $service, $options = array()) {
 
-        return function(Request $request, $id = null, $params = array()) use ($app, $service) {
+        return function(Request $request, $id = null, $params = array()) use ($app, $service, $options) {
             $page = ($id === null) ? $service->createEntity($params) : $service->fetch($id);
 
             if ($page === false) $app->abort('404', "the entity (id={$id}) you are looking for could not be found");
@@ -88,10 +89,13 @@ class DbControllerProvider implements ControllerProviderInterface {
                 return $app->redirect($app->url('admin_' . $service->getServiceName() . '_edit', array('id' => $page->getId())));
             }
 
+            $app->log('view type: ' . (empty($options['viewType']) ? 'edit' : 'view'));
             return $app['twig']->render('admin/layout.twig', array(
                 'content' => $app['twig']->render($this->getEntityLayout(), array(
                         'entity' => $page,
                         'form' => $form->createView(),
+                        'entityName' => $service->getServiceName(),
+                        'linkType' => empty($options['viewType']) ? 'edit' : 'view',
                     )),
             ));
         };
@@ -101,13 +105,16 @@ class DbControllerProvider implements ControllerProviderInterface {
     /**
      * @param \Twig_Environment[] $app
      * @param DbEntityService $service
+     * @param array $options
      * @return callable
      */
-    protected function _getListProcessor($app, $service) {
-        return function () use ($app, $service) {
+    protected function _getListProcessor($app, $service, $options = array()) {
+        return function () use ($app, $service, $options) {
             return $app['twig']->render('admin/layout.twig', array(
                 'content' => $app['twig']->render($this->getListLayout(), array(
                         'entities' => $service->fetchAll(),
+                        'entityName' => $service->getServiceName(),
+                        'linkType' => empty($options['viewType']) ? 'edit' : 'view',
                     )),
             ));
         };

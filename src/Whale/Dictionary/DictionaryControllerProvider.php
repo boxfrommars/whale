@@ -5,9 +5,12 @@
 
 namespace Whale\Dictionary;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Silex\Application;
 use Silex\ControllerCollection;
 use Silex\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Whale\Db\DbActionService;
 use Whale\Db\DbControllerProvider;
 use Whale\Db\DbEntityService;
 use Whale\Db\Entity\DbContentEntryServiceProvider;
@@ -22,27 +25,75 @@ class DictionaryControllerProvider extends DbControllerProvider {
      */
     public function connect(Application $app)
     {
-        /** @var \Twig_Environment[]|DbEntityService[] $app */
+        /** @var \Twig_Environment[]|DbEntityService[]|DbActionService[] $app */
         /** @var ControllerCollection|Route $controllers */
         $controllers = $app['controllers_factory'];
-        $processor = $this->_getEntityProcessor($app, $app['dict.dict_service']);
-        $entryProcessor = $this->_getEntityProcessor($app, $this->getService());
 
-        $controllers->get('/', $this->_getListProcessor($app, $app['dict.dict_service']))->bind('admin_' . $app['dict.dict_service']->getServiceName() . '_list');
-        $controllers->match('/edit/{id}', $processor)->bind('admin_' . $app['dict.dict_service']->getServiceName() . '_edit');
+        $dictName = $app['dict.dict_service']->getServiceName();
+        $entryName = $app['dict.entry_service']->getServiceName();
 
-        /*
-        $controllers->get('/', $this->_getListProcessor($app))->bind('admin_' . $this->_serviceName . '_list');
-        $controllers->match('/edit/{id}', $processor)->bind('admin_' . $this->_serviceName . '_edit');
-        $controllers->match('/create', $processor)->bind('admin_' . $this->_serviceName . '_create');
-        $controllers->match('/create/{paramName}/{paramValue}', function(Request $request, $paramName, $paramValue) use ($app, $processor) {
-            return $processor($request, null, array($paramName => $paramValue));
-        })->bind('admin_' . $this->_serviceName . '_create_parented');
-*/
+        $controllers->get('/', $app['action.db']->create(
+            'list',
+            array(
+                'view' => array('linkType' => 'view', 'contentLayout' => 'admin/list.twig'),
+                'service' => $app['dict.dict_service'],
+            )
+        ))->bind($this->getRoute($dictName, 'list'));
+
+        $controllers->match('/edit/{id}', $app['action.db']->create(
+            'entity',
+            array(
+                'view' => array('contentLayout' => 'admin/entity.twig'),
+                'service' => $app['dict.dict_service'],
+            )
+        ))->bind($this->getRoute($dictName, 'edit'));
+
+        $controllers->match('/view/{id}', function(Request $request, $id) use ($app) {
+            $action = $app['action.db']->create(
+                'list',
+                array(
+                    'view' => array('linkType' => 'edit', 'contentLayout' => 'admin/listParented.twig'),
+                    'service' => $app['dict.entry_service'],
+                    'query' => array(
+                        'where' => array('e.id_dictionary = :id_dict'),
+                        'params' => array('id_dict' => $id),
+                    ),
+                )
+            );
+            return $action($request, $id);
+
+        })->bind($this->getRoute($dictName, 'view'));
+
+        $controllers->match('/edit/{idParent}/{id}', function(Request $request, $idParent, $id) use ($app) {
+            $action = $app['action.db']->create(
+                'entity',
+                array(
+                    'view' => array('contentLayout' => 'admin/entity.twig'),
+                    'service' => $app['dict.entry_service'],
+                )
+            );
+            return $action($request, $id, array('idParent' => $idParent));
+
+        })->bind($this->getRoute($entryName, 'edit'));
+
         $controllers->before(function () use ($app) {
-            $app['twig']->addGlobal('_service_name', $this->_serviceName);
+            $app['twig']->addGlobal('sidebar', $app['twig']->render('admin/list.twig', array(
+                'entities' => $app['dict.dict_service']->fetchAll(),
+                'entityName' => $app['dict.dict_service']->getServiceName(),
+                'linkType' => 'view',
+            )));
         });
 
+
         return $controllers;
+    }
+
+    /**
+     * @param string $name
+     * @param string $action
+     * @return string
+     */
+    protected function getRoute($name, $action){
+        return "admin_{$name}_{$action}";
     }
 }

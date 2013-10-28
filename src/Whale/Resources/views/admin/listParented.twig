@@ -9,7 +9,7 @@
     {% set linkType = linkType|default('edit') %}
     {% for entity in entities %}
         <tr>
-            <td><a href="{{ path('admin_' ~ entityName ~ '_' ~ linkType, {id: entity.getId}) }}">{{ entity.getTitle }}</a></td>
+            <td><a href="{{ path('admin_' ~ entityName ~ '_' ~ linkType, {id: entity.getId, idParent: entity.idParent}) }}">{{ entity.getTitle }}</a></td>
             <td>
                 <a class="btn pull-right action edit" href="#"><i class="icon-edit"></i></a>
             </td>

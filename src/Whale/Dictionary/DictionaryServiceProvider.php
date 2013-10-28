@@ -9,6 +9,7 @@ namespace Whale\Dictionary;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Whale\Db\DbEntityService;
+use Whale\WhaleApplication;
 
 class DictionaryServiceProvider implements ServiceProviderInterface {
     /**
@@ -20,6 +21,7 @@ class DictionaryServiceProvider implements ServiceProviderInterface {
      */
     public function register(Application $app)
     {
+        /** @var WhaleApplication $app */
         $app['dict.entry_entity'] = $app->protect(function($data = array()){
             return new DictionaryEntryEntity($data);
         });

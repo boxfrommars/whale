@@ -38,7 +38,7 @@ class DictionaryEntryForm extends AbstractType {
                 'label' => 'Словарь',
                 'attr' => $defaultInputAttrs,
                 'choices' => $this->getDictionaries(),
-                'required'  => false,
+                'required'  => true,
             ))
             ->add('title', 'text', array(
                 'label' => 'Заголовок',
